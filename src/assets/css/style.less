@@ -6,6 +6,7 @@
 .z-depth-4{box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.3);}
 .z-depth-5{box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.3);}
 //全局
+html,body,#app{width: 100%;height: 100%;} //全屏
 body{background-color: #fff;}
 
 //ElementUI
@@ -14,12 +15,32 @@ body{background-color: #fff;}
 
 //WebUploader
 #uploader{line-height: 1}
-#picker{display: inline-block;vertical-align: middle;}
-#picker .webuploader-pick{background: #387710}
-#picker .webuploader-pick-hover{background: #418E10}
+#filePicker{display: inline-block;vertical-align: middle;}
+#filePicker .webuploader-pick{background: #387710}
+#filePicker .webuploader-pick-hover{background: #418E10}
+#imgWrap{margin-top: 5px}
+.uploaderImg{width:150px;height:100px;margin:5px;}
+
+//登录
+.login{width: 100%;height: 100%;background: url('../img/login_bg.jpg') no-repeat;background-size: cover;background-position: center;}
+.login .self-form-item{margin-bottom: 5px;margin-top: -5px;}
+.login .container{position: fixed;width: 310px;top:25%;right:8%;}
+.login .title{text-align: center;margin:10px 0 20px;color: @base-color}
+.login .forget,{float: right;color: #444;}
+.login .code-text{width: 90px;display: inline-block;margin-right: 20px;}
+.login .code-img{display: inline-block;width: 80px;height: 36px;padding-right: 10px;
+vertical-align: top;border: 1px solid #ddd}
+.login .code-img:hover{cursor: pointer;}
+.login .code-btn{float: right;color: #444;}
+// .login .el-form-item{margin-bottom: 20px;}
+.login-btn{width: 100%;}
 
 //顶部
 .top-header{height: 80px;line-height: 80px;padding: 0 5%;background-color: @base-color;color: #fff;box-shadow: 0 5px 5px rgba(0, 0, 0, 0.15)}
+.top-header .title{float: left}
+.top-header .exit{float: right}
+.top-header .exit-btn{margin-left: 10px;}
+
 //侧边栏
 .sidebar{float: left;width: 15%;min-height: 400px;box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.2)}
 //主体内容
@@ -35,6 +56,7 @@ body{background-color: #fff;}
 .dialog-card li{margin-bottom: 10px;font-size: 16px;}
 .dialog-card li .card-label{display: inline-block;width: 100px;font-weight: 600;}
 .dialog-card li .card-input{display: inline-block;width: 80%;vertical-align: top;}
+.dialog-card li .card-img{display: inline-block;max-width: 200px;max-height: 150px;vertical-align: top;overflow: hidden;}
 
 //质量曝光
 .exposureList-show{margin-top: 50px;}

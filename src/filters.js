@@ -11,19 +11,25 @@ export default{
         str = '全部'
         break;
       case 1:
-        str = '食品'
+        str = '电器'
         break;
       case 2:
-        str = '文玩'
+        str = '汽车'
         break;
       case 3:
-        str = '服饰'
+        str = '建材'
         break;
       case 4:
-        str = '日用品'
+        str = '数码'
         break;
       case 5:
-        str = '小商品'
+        str = '食品'
+        break;
+      case 6:
+        str = '医疗'
+        break;
+      case 7:
+        str = '其他'
         break;
       default:
         str = ''

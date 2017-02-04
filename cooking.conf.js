@@ -12,19 +12,26 @@ cooking.set({
   devServer: {
     hostname: '192.168.1.155',
     port: 6001,
-    publicPath: '/'
+    publicPath: '/',
+    proxy: {
+      '/api/*': {
+          target: 'http://api.chinaeid.cn',
+          secure: false,
+      }
+      //  '/api': 'http://api.chinaeid.cn'
+    },
   },
 
   // production
   clean: true,
   hash: true,
-  sourceMap: true,
+  sourceMap: false,
   minimize: true,
   chunk: true, // see https://cookingjs.github.io/zh-cn/configuration.html#chunk
   postcss: [
     require('autoprefixer')
   ],
-  publicPath: '/dist/',
+  publicPath: './',
   assetsPath: 'static',
   urlLoaderLimit: 10000,
   extractCSS: '[name].[contenthash:7].css',

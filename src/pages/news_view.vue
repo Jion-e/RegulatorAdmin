@@ -14,9 +14,9 @@
       </div>
       <div class="news__cont"  v-html="news.content"></div>
     </div>
-    <p>
+    <!-- <p>
       {{news}}
-    </p>
+    </p> -->
   </div>
 </template>
 

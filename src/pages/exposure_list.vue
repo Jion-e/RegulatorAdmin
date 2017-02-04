@@ -37,13 +37,13 @@
         @selection-change="handleTableSelection">
         <el-table-column type="selection" width="50"></el-table-column>
         <!-- <el-table-column prop="id" label="编号" width="60"></el-table-column> -->
-        <el-table-column prop="companyName" label="企业名称"></el-table-column>
+        <el-table-column prop="companyName" label="企业名称" width="250"></el-table-column>
         <el-table-column prop="location" label="企业所在地"></el-table-column>
         <el-table-column prop="productName" label="产品名称"></el-table-column>
         <el-table-column prop="productClass1Name" label="所属行业"></el-table-column>
         <el-table-column prop="batch" label="生产日期/批号"></el-table-column>
-        <el-table-column prop="reason" label="不合格项目"></el-table-column>
-        <el-table-column prop="accreditationBody" label="承建机构"></el-table-column>
+        <!-- <el-table-column prop="reason" label="不合格项目" width="200"></el-table-column> -->
+        <el-table-column prop="accreditationBody" label="承建机构" width="150"></el-table-column>
         <el-table-column inline-template label="操作" align="center" width="150">
           <div class="btn-group">
             <el-button type="text" @click.native="edit(row)">编辑</el-button>
@@ -63,9 +63,9 @@
           :total="page.total">
        </el-pagination>
       </div>
-      <p>
+      <!-- <p>
         {{exposureList}}
-      </p>
+      </p> -->
     </div>
     <el-dialog class="dialog" title="查看" v-model="viewDialog" size="small" lock-scroll>
       <el-card class="dialog-card">
@@ -168,9 +168,9 @@
             <el-button type="primary" @click.native="update">保存</el-button>
             <el-button type="default" @click.native="editDialog = false">取消</el-button>
           </el-form-item>
-          <p>
+          <!-- <p>
             {{exposure}}
-          </p>
+          </p> -->
         </el-form>
       </el-card>
     </el-dialog>
@@ -180,7 +180,7 @@
 <script>
 import api from '../api'
 import category from '../api/category'
-import { exposureInit, PageInit } from '../api/config'
+import { ExposureInit, PageInit } from '../api/config'
 
 export default {
   data() {
@@ -270,10 +270,18 @@ export default {
     //分页页数
     handleSizeChange(val){
       this.page.size = parseInt(val)
+      api.fetchExposureList(this.page.current - 1, this.page.size).then(data => {
+        this.exposureList = JSON.parse(data.data)
+        this.page.total = data.total
+      }).catch(err => this.$message.error(err))
     },
     //分页当前页
     handleCurrentChange(val){
       this.page.current = parseInt(val)
+      api.fetchExposureList(this.page.current - 1, this.page.size).then(data => {
+        this.exposureList = JSON.parse(data.data)
+        this.page.total = data.total
+      }).catch(err => this.$message.error(err))
     },
     /**
      * 编辑
@@ -289,12 +297,16 @@ export default {
      * 更新
      * @return {[string]}     [成功/失败]
      */
-    update(){
+    update(row){
       this.editDialog = false
       //获取列表信息
-      api.fetchExposureList(this.page.current - 1, this.page.size).then(data => {
-        this.exposureList = JSON.parse(data.data)
-        this.page.total = data.total
+      api.updateExposure(this.exposure).then(data => {
+        this.$message.success(data)
+        //获取列表信息
+        api.fetchExposureList(this.page.current - 1, this.page.size).then(data => {
+          this.exposureList = JSON.parse(data.data)
+          this.page.total = data.total
+        }).catch(err => this.$message.error(err))
       }).catch(err => this.$message.error(err))
     },
     /**

@@ -48,7 +48,12 @@
           </el-select>
         </el-form-item>
         <el-form-item label="缩略图">
-          <input type="file">
+          <div id="uploader">
+            <div class="btns">
+              <div id="filePicker" class="uploadInput">选择图片</div>
+            </div>
+            <div id="imgWrap"></div>
+          </div>
         </el-form-item>
         <el-form-item label="内容编辑">
           <textarea id="editor-trigger"  style="height:400px;max-height:500px">
@@ -60,17 +65,18 @@
         </el-form-item>
       </el-form>
     </div>
-    <p>
+    <!-- <p>
       {{news}}
-    </p>
+    </p> -->
   </div>
 </template>
 
 <script>
 import api from '../api'
-import { NewsInit, platforms, newsCategories, newsTypes } from '../api/config'
+import { NewsInit, platforms, newsCategories, newsTypes, HOST } from '../api/config'
 
 import wangEditor from 'wangEditor'
+import WebUploader from 'webuploader/dist/webuploader.js'
 import moment from 'moment'
 export default {
   data() {
@@ -85,10 +91,14 @@ export default {
     const id = this.$route.params.id
     api.fetchNews(id).then(data => {
       this.news = data
+      if(this.news.thumbnail){
+        $('#imgWrap').append('<img src=' + this.news.thumbnail + ' width="150">')
+      }
     }).catch(err => this.$message.error(err))
   },
   mounted() {
       this.wangEditorInit()
+      this.webUploaderInit()
       setTimeout(() => {
         $('.wangEditor-txt').html(this.news.content)
       }, 300)
@@ -107,6 +117,45 @@ export default {
          vm.news.content = $('.wangEditor-txt').html()
       }
       editor.create()
+    },
+    webUploaderInit(){
+      const vm = this
+      var uploader = WebUploader.create({
+        swf: require('webuploader/dist/Uploader.swf'),
+        server: `${HOST}common/upload/image`,
+        pick: {
+          id: '#filePicker',
+          multiple: false
+        },
+        auto: true,
+        resize: true, //压缩
+        accept: {
+          title: 'Images',
+          extensions: 'gif,jpg,jpeg,bmp,png',
+          mimeTypes: 'image/*'
+        }
+      })
+      // 当有文件添加进来的时候
+      uploader.on('fileQueued', function(file) {
+        const $li = $('<div id="' + file.id + '" class="file-item thumbnail">' + '<img>' +          '<div class="info">' + file.name + '</div>' + '</div>')
+        const $img = $li.find('img')
+        const $list = $("#imgWrap")
+
+        $list.html($li)
+        // 创建缩略图
+        uploader.makeThumb(file, function(error, src) {
+          if (error) {
+            $img.replaceWith('<span>不能预览</span>')
+            return
+          }
+          $img.attr('src', src)
+        }, 150, 100)
+      })
+      //成功
+      uploader.on( 'uploadSuccess', function( file, response ) {
+        vm.$message.success('上传成功')
+        vm.news.thumbnail = response._raw  //返回图片地址
+      })
     },
     /**
      * 保存

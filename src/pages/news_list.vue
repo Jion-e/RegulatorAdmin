@@ -36,7 +36,7 @@
       <el-table :data="newsList" border fit stripe @selection-change="handleTableSelection" style="width:100%">
         <el-table-column type="selection" width="50"></el-table-column>
         <!-- <el-table-column prop="id" label="编号" width="60"></el-table-column> -->
-        <el-table-column prop="title" label="标题"></el-table-column>
+        <el-table-column prop="title" label="标题" width="300"></el-table-column>
         <el-table-column prop="type" label="分类" :formatter="newsTypeFormat"></el-table-column>
         <el-table-column prop="platform" label="发布平台" :formatter="newsPlatformFormat"></el-table-column>
         <el-table-column prop="publishTime" label="发布时间" :formatter="timeFormat"></el-table-column>
@@ -151,10 +151,18 @@ export default {
     //分页页数
     handleSizeChange(val){
       this.page.size = parseInt(val)
+      api.fetchNewsList(this.page.current - 1, this.page.size).then(data => {
+        this.newsList = JSON.parse(data.data)
+        this.page.total = data.total
+      }).catch(err => this.$message.error(err))
     },
     //分页当前页
     handleCurrentChange(val){
       this.page.current = parseInt(val)
+      api.fetchNewsList(this.page.current - 1, this.page.size).then(data => {
+        this.newsList = JSON.parse(data.data)
+        this.page.total = data.total
+      }).catch(err => this.$message.error(err))
     },
     /**
      * 编辑

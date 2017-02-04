@@ -1,6 +1,37 @@
-const basePath = 'http://192.168.1.155:8080/regulator/'
+import { HOST } from './config'
+
+const basePath = `${HOST}`
+console.log(basePath);
 
 export default {
+  login({name, password}){
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        type: 'GET',
+        url: `${HOST}login/admin`,
+        data: {
+          username: name,
+          passwd: password
+        }
+      }).done(data => {
+        resolve(data)
+      }).fail(() => {
+        reject('登录异常')
+      })
+    })
+  },
+  createCode(){
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        type: 'GET',
+        url: `${HOST}common/verification/image`,
+      }).done(data => {
+        resolve(data)
+      }).fail(() => {
+        reject('获取验证码失败')
+      })
+    })
+  },
   /******************** 热点新闻 *****************/
   fetchNews(id){
     return new Promise((resolve, reject) => {
@@ -20,6 +51,7 @@ export default {
       $.ajax({
           type: 'GET',
           url: `${basePath}focus/get/type`,
+          // url: '/api/focus/get/type',
           data:{
             current: current,
             size: size,
@@ -204,7 +236,7 @@ export default {
           headers : {'Content-Type': 'application/json;charset=utf-8'},
           data: JSON.stringify(exposureList)
         }).done(data => {
-          if(data === 1){
+          if(typeof data === 'number'){
             resolve('保存成功')
           }else{
             resolve('保存失败')

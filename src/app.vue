@@ -1,14 +1,6 @@
 <template>
   <div id="app">
-    <v-header></v-header>
-    <div class="warp">
-        <div class="sidebar">
-          <v-sidebar></v-sidebar>
-        </div>
-        <div class="page">
-            <router-view keep-alive></router-view>
-        </div>
-    </div>
+    <router-view keep-alive></router-view>
   </div>
 </template>
 

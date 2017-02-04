@@ -4,8 +4,8 @@
       <h2>添加质量曝光</h2>
     </div>
     <div class="page-form-add">
-      <el-form :model="exposure" ref="exposure" label-position="left" label-width="100px">
-        <el-form-item label="所属行业">
+      <el-form :model="exposure" :rules="exposureRules" ref="exposureForm" label-position="left" label-width="100px">
+        <el-form-item label="所属行业" prop="productClass1">
           <el-select clearable v-model.number="exposure.productClass1" placeholder="所属行业" @change="HandleCategoryChange">
             <el-option
              v-for="item in product_class1"
@@ -15,7 +15,7 @@
            </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="细分行业">
+        <el-form-item label="细分行业" prop="productClass2">
           <el-select clearable v-model.number="exposure.productClass2" placeholder="细分行业">
             <el-option
              v-for="item in product_class2"
@@ -56,8 +56,8 @@
           <div id="uploader" class="wu-example">
             <div id="thelist" class="uploader-list"></div>
             <div class="btns">
-              <div id="picker">选择文件</div>
-              <button id="ctlBtn" class="el-button el-button--default">开始上传</button>
+              <div id="filePicker">选择文件</div>
+              <!-- <button id="ctlBtn" class="el-button el-button--default">开始上传</button> -->
             </div>
           </div>
         </el-form-item>
@@ -67,7 +67,7 @@
         </el-form-item>
       </el-form>
       <div class="exposureList-show" v-show="isShow">
-        <h3 class="title">Excel文件内容</h3>
+        <h3 class="title">不合格产品</h3>
         <el-table :data="exposureList" border fit stripe style="width: 95%">
           <el-table-column prop="companyName" label="企业名称" width="250"></el-table-column>
           <el-table-column prop="location" label="企业所在地" width="110"></el-table-column>
@@ -87,18 +87,26 @@
 <script>
 import api from '../api'
 import category from '../api/category'
-import { exposureInit } from '../api/config'
+import { ExposureInit, HOST } from '../api/config'
+
 import moment from 'moment'
-import 'webuploader/dist/webuploader.css'
 import WebUploader from 'webuploader/dist/webuploader.js'
 export default {
   data() {
     return {
       isShow: false,
-      exposure: new exposureInit(), //创建曝光实例
+      exposure: new ExposureInit(), //创建曝光实例
       exposureList: [],
       product_class1: category.product_class1,
       product_class2: [],
+      exposureRules: {
+        productClass1: [
+          { type: 'number', required: true, message: '所属行业不能为空', trigger: 'change'},
+        ],
+        productClass2: [
+          { type: 'number', required: true, message: '细分行业不能为空', trigger: 'change'},
+        ],
+      }
     };
   },
   mounted(){
@@ -106,14 +114,15 @@ export default {
     var uploader = WebUploader.create({
         swf: require('webuploader/dist/Uploader.swf'),
         // swf: 'webuploader/dist/Uploader.swf',
-        server: 'http://localhost:8080/regulator/exposure/upload/excel',
+        server: `${HOST}exposure/upload/excel`,
         pick: {
-          id: '#picker',
+          id: '#filePicker',
           innerHTML: '选择Excel文件',
           multiple: false
         },
         // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
         resize: false,
+        auto: true,
         accept: {
           title: 'Excel',
           extensions: 'xls',
@@ -163,10 +172,10 @@ export default {
       $('#' + file.id).find('.progress').fadeOut();
     });
 
-    $('#ctlBtn').click(function(e) {
-      uploader.upload();
-      e.preventDefault();
-    });
+    // $('#ctlBtn').click(function(e) {
+    //   uploader.upload();
+    //   e.preventDefault();
+    // });
   },
   methods: {
     /**
@@ -185,25 +194,26 @@ export default {
      * @return {[string]} [成功/失败]
      */
     save(){
-      if(!(this.exposure.productClass1 && this.exposure.productClass2)){
-        this.$notify.error({
-          title: '错误',
-          message: '请选择行业'
-        })
-        return false
-      }
-      this.exposureList.forEach(item => {
-        item.createTIme = moment().format('YYYY-MM-DD HH:mm:ss')
-        item.is = 0
-        item.productClass1 = this.exposure.productClass1
-        item.productClass2 = this.exposure.productClass2
-        item.productClass1Name = this.exposure.productClass1Name
-        item.productClass2Name = this.exposure.productClass2Name
+      this.$refs.exposureForm.validate((valid) => {
+        if (valid) {
+          this.exposureList.forEach(item => {
+            item.createTIme = moment().format('YYYY-MM-DD HH:mm:ss')
+            item.is = 0
+            item.productClass1 = this.exposure.productClass1
+            item.productClass2 = this.exposure.productClass2
+            item.productClass1Name = this.exposure.productClass1Name
+            item.productClass2Name = this.exposure.productClass2Name
+          })
+          api.saveExposure(this.exposureList).then(data => {
+            this.$message.success(data)
+            this.$router.push({path: '/ExposureList'})
+          }).catch(err => this.$message.error(err))
+        }else{
+          vm.$message.warning('曝光信息填写不全')
+          window.scrollTo(0, 0)
+        }
       })
-      api.saveExposure(this.exposureList).then(data => {
-        this.$message.success(data)
-        this.$router.push({path: '/ExposureList'})
-      }).catch(err => this.$message.error(err))
+
     },
     /**
      * 重置表单
@@ -214,7 +224,8 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.exposure = new exposureInit()
+        this.exposure = new ExposureInit()
+        window.location.reload()
       })
     }
   },
